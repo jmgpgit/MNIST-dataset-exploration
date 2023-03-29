@@ -51,8 +51,8 @@ def activation(x, d=False, fn = 'sigmoid'):
         if d:
             return 1
         return x
-    
-    
+    raise ValueError("Invalid activation function: %s" % fn)
+
 class Layer:
     """A layer of neuron nodes.
 
@@ -124,7 +124,7 @@ class Neurons:
 
 
 class Neural_Network:
-    """A neural network.
+    """A neural network for classification of numbers 0-9 in images of size 28x28 greyscale pixels.
     
     Attributes:
         input_size (int): The number of inputs to the network.
@@ -140,18 +140,15 @@ class Neural_Network:
         train (np.array): Train the network.
         test (np.array): Test the network.
     """
-    
-    
-    
-    
-    def __init__(self, output_size,hidden_size, hidden_layers=1):
+
+    def __init__(self, hidden_size, hidden_layers=1):
         self.input_size = 28*28 # 28x28 pixels
         self.hidden_size = hidden_size
-        self.output_size = output_size
+        self.output_size = 10 # 0-9 digits
         
         self.layers = [Layer(self.input_size)]
         self.layers.extend([Layer(hidden_size) for _ in range(hidden_layers)])
-        self.layers.append(Layer(output_size))
+        self.layers.append(Layer(self.output_size))
         
         self.neurons = [Neurons(self.layers[i], self.layers[i+1]) for i in range(len(self.layers)-1)][::-1]
     
@@ -176,7 +173,7 @@ class Neural_Network:
         Returns:
             None
         """
-        self.layers[0].values = np.array(image)/256 #normalize pixel values
+        self.layers[0].values = np.array(image)/255 #normalize pixel values
         neurs = self.neurons[::-1]
         for depth, layer in enumerate(self.layers[1:]):
             layer.values = activation(np.dot(neurs[depth].weights, self.layers[depth]) + neurs[depth].biases, fn=fn)
@@ -253,7 +250,6 @@ class Neural_Network:
             self.feed_forward(images[i], fn=fn)
             if self.output() == labels[i]:
                 correct += 1
-                print("Correct: " % (correct, labels[i], self.output()))
         return correct/len(images)
 
               
