@@ -1,1 +1,1 @@
-# MNIST-dataset-exploration
+### Creating a Neural Network from Scratch (MNIST Dataset)
